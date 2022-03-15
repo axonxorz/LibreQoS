@@ -24,9 +24,6 @@ shapeBySite = True
 # Allow shell commands. False causes commands print to console only without being executed. MUST BE ENABLED FOR PROGRAM TO FUNCTION
 enableActualShellCommands = True
 
-# Add 'sudo' before execution of any shell commands. May be required depending on distribution and environment.
-runShellCommandsAsSudo = False
-
 # Optional UISP integration
 # Everything before /nms/ on your UISP instance
 UISPbaseURL = 'https://examplesite.com'

@@ -36,16 +36,13 @@ from ispConfig import (
     interfaceA,
     interfaceB,
     shapeBySite,
-    enableActualShellCommands,
-    runShellCommandsAsSudo
+    enableActualShellCommands
 )
 import collections
 
 
 def shell(command):
     if enableActualShellCommands:
-        if runShellCommandsAsSudo:
-            command = 'sudo ' + command
         commands = command.split(' ')
         print(command)
         proc = subprocess.Popen(commands, stdout=subprocess.PIPE)
@@ -64,8 +61,6 @@ def clearPriorSettings(interfaceA, interfaceB):
     shell('tc filter delete dev ' + interfaceB + ' root')
     shell('tc qdisc delete dev ' + interfaceB + ' root')
     shell('tc qdisc delete dev ' + interfaceB)
-    if runShellCommandsAsSudo:
-        clearMemoryCache()
 
 
 def refreshShapers():

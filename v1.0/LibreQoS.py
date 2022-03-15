@@ -21,6 +21,7 @@
 #           |_____|_|_.__/|_|  \___|\__\_\\___/____/
 #                          v.1.0-stable
 #
+import logging
 import os
 import io
 import json
@@ -41,15 +42,20 @@ from ispConfig import (
 import collections
 
 
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger('libreqos')
+logger_shell = logger.getChild('shell')
+
+
 def shell(command):
     if enableActualShellCommands:
         commands = command.split(' ')
-        print(command)
+        logger_shell.debug(command)
         proc = subprocess.Popen(commands, stdout=subprocess.PIPE)
         for line in io.TextIOWrapper(proc.stdout, encoding="utf-8"):  # or another encoding
             print(line)
     else:
-        print(command)
+        logger_shell.debug(command)
 
 
 def clearPriorSettings(interfaceA, interfaceB):
@@ -126,7 +132,7 @@ def refreshShapers():
     # If an AP is specified for a device in Shaper.csv, but AP is not listed in AccessPoints.csv, raise exception
     for device in devices:
         if (device['AP'] not in accessPointNamesOnly):
-            print(device['AP'])
+            logger.debug(device['AP'])
             raise ValueError('AP for device ' + device['hostname'] + ' not listed in AccessPoints.csv')
 
     # Load Sites
@@ -161,7 +167,7 @@ def refreshShapers():
     queuesAvailable = 0
     path = '/sys/class/net/' + interfaceA + '/queues/'
     directory_contents = os.listdir(path)
-    print(directory_contents)
+    logger.debug(directory_contents)
     for item in directory_contents:
         if "tx-" in str(item):
             queuesAvailable += 1
@@ -212,7 +218,6 @@ def refreshShapers():
             queue + 1) + ':2 htb rate ' + str(defaultClassCapacityUploadMbps / 4) + 'mbit ceil ' + str(
             defaultClassCapacityUploadMbps) + 'mbit prio 5')
         shell('tc qdisc add dev ' + thisInterface + ' parent ' + str(queue + 1) + ':2 ' + fqOrCAKE)
-    print()
 
     # If shapeBySite == True, Shape by Site, AP and Client
     if shapeBySite:
@@ -224,7 +229,7 @@ def refreshShapers():
             queueMinorCounterDict[queueNum + 1] = 3
         for site in sites:
             siteName, siteDownloadMbps, siteUploadMbps, apsForThisSite = site
-            print("Adding site " + siteName)
+            logger.debug("Adding site " + siteName)
             major = currentQueueCounter
             minor = queueMinorCounterDict[currentQueueCounter]
             thisSiteclassID = str(currentQueueCounter) + ':' + str(minor)
@@ -239,10 +244,9 @@ def refreshShapers():
                 round(siteUploadMbps)) + 'mbit prio 3')
             shell('tc qdisc add dev ' + interfaceB + ' parent ' + str(major) + ':' + str(minor) + ' ' + fqOrCAKE)
             minor += 1
-            print()
             for AP in apsForThisSite:
                 APname, apDownload, apUpload, parentSite, devicesForThisAP = AP
-                print("Adding AP " + APname)
+                logger.debug("Adding AP " + APname)
                 # HTB + qdisc for each AP
                 # Guarentee AP gets at least 1/4 of its capacity, allow up to its max capacity when network not at peak load
                 shell('tc class add dev ' + interfaceA + ' parent ' + thisSiteclassID + ' classid ' + str(
@@ -255,9 +259,8 @@ def refreshShapers():
                 shell('tc qdisc add dev ' + interfaceB + ' parent ' + str(major) + ':' + str(minor) + ' ' + fqOrCAKE)
                 thisAPclassID = str(currentQueueCounter) + ':' + str(minor)
                 minor += 1
-                print()
                 for device in devicesForThisAP:
-                    print("Adding device " + device['hostname'])
+                    logger.debug("Adding device " + device['hostname'])
                     # HTB + qdisc for each device
                     shell('tc class add dev ' + interfaceA + ' parent ' + thisAPclassID + ' classid ' + str(
                         minor) + ' htb rate ' + str(device['downloadMin']) + 'mbit ceil ' + str(
@@ -348,9 +351,9 @@ def refreshShapers():
 
     # Done
     currentTimeString = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-    print("Successful run completed on " + currentTimeString)
+    logger.info("Successful run completed on " + currentTimeString)
 
 
 if __name__ == '__main__':
     refreshShapers()
-    print("Program complete")
+    logger.info("Program complete")

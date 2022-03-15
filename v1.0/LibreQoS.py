@@ -21,19 +21,24 @@
 #           |_____|_|_.__/|_|  \___|\__\_\\___/____/
 #                          v.1.0-stable
 #
-import random
-import logging
 import os
 import io
 import json
 import csv
 import subprocess
-from subprocess import PIPE
-import ipaddress
-from ipaddress import IPv4Address, IPv6Address
-import time
-from datetime import date, datetime
-from ispConfig import fqOrCAKE, upstreamBandwidthCapacityDownloadMbps, upstreamBandwidthCapacityUploadMbps, defaultClassCapacityDownloadMbps, defaultClassCapacityUploadMbps, interfaceA, interfaceB, shapeBySite, enableActualShellCommands, runShellCommandsAsSudo
+from datetime import datetime
+from ispConfig import (
+    fqOrCAKE,
+    upstreamBandwidthCapacityDownloadMbps,
+    upstreamBandwidthCapacityUploadMbps,
+    defaultClassCapacityDownloadMbps,
+    defaultClassCapacityUploadMbps,
+    interfaceA,
+    interfaceB,
+    shapeBySite,
+    enableActualShellCommands,
+    runShellCommandsAsSudo
+)
 import collections
 
 def shell(command):

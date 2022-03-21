@@ -9,17 +9,17 @@ upstreamBandwidthCapacityDownloadMbps = 1000
 upstreamBandwidthCapacityUploadMbps = 1000
 
 # Traffic from devices not specified in Shaper.csv will be rate limited by an HTB of this many Mbps
-defaultClassCapacityDownloadMbps = 500
-defaultClassCapacityUploadMbps = 500
+defaultClassCapacityDownloadMbps = 10
+defaultClassCapacityUploadMbps = 10
 
-# Interface connected to core router
-interfaceA = 'eth1'
+# TODO: docs
+tcpOverheadFactor = 1.09
 
-# Interface connected to edge router
-interfaceB = 'eth2'
+# Interface connected to core router (LAN SIDE)
+#interfaceA = 'enp6s0'
 
-# Shape by Site in addition to by AP and Client
-shapeBySite = True
+# Interface connected to edge router (WAN SIDE)
+#interfaceB = 'enp1s0'
 
 # Allow shell commands. False causes commands print to console only without being executed. MUST BE ENABLED FOR PROGRAM TO FUNCTION
 enableActualShellCommands = True
